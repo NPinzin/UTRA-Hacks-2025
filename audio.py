@@ -49,24 +49,38 @@ def readAudio():
     print(f"Audio saved as {OUTPUT_FILE}")
 
 
-
-def main():
-    print(OPENAI_API_KEY)
-    readAudio()
-    transcribe()
-
-
-def transcribe(): 
-    client = OpenAI()
+def transcribe() -> str: 
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
     audio_file= open("" + OUTPUT_FILE, "rb")
     transcription = client.audio.transcriptions.create(
         model="whisper-1", 
         file=audio_file,
         response_format="json"
-    )
+    ) 
+    return transcription.text
 
-    print(transcription.text)
+def getSymptoms(transcription: str) -> str:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are extracting symptoms from a provided transcription from a hospital visit, return them in a comma separated list."},
+            {
+                "role": "user",
+                "content": transcription
+            }
+        ]
+    )
+    return completion.choices[0].message
+
+
+def main():
+    readAudio()
+    transcription = transcribe()
+    symptoms = getSymptoms(transcription)
+    print(symptoms)
+
 
 if __name__ == "__main__":
     main()
