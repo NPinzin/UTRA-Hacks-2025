@@ -6,21 +6,22 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 UPLOAD_FOLDER = "uploads"  # Store all audio files in this directory
 BASE_URL = "http://localhost:5000/uploads/"  # Access uploaded files via this URL
-symptom_message = [
-    {"role": "system", "content": "You are extracting symptoms from a hospital visit transcription. Return a comma-separated list of symptoms or an empty string if none."}
+
+ORIGINAL_SYMPTOM_MESSAGES = [
+    {"role": "system", "content": "You are extracting symptoms from a hospital visit transcription. Return a comma-separated list of symptoms including all previously meantioned symptoms."}
 ]
-response_messages = [
-    {
-        "role": "system",
-        "content": (
-            "You are a hospital pre-screening AI. You must ask targeted follow-up "
-            "questions based on the patient’s symptoms to help doctors diagnose better. "
-            "Do not repeat previous questions. Ask different things each time. If symptoms are unclear, "
-            "probe for details (e.g., duration, severity, triggers). Keep responses brief and focused."
-        )
-    }
+ORIGINAL_RESPONSE_MESSAGES = [
+    {"role": "system", "content": (
+        "You are a hospital pre-screening AI. You must ask targeted follow-up "
+        "questions based on the patient’s symptoms to help doctors diagnose better. "
+        "Do not repeat previous questions. Ask different things each time. If symptoms are unclear, "
+        "probe for details (e.g., duration, severity, triggers). Keep responses brief and focused."
+    )}
 ]
 
+# Create mutable copies
+symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
+response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
 
 
 def transcribe(filepath) -> str: 
@@ -35,12 +36,12 @@ def transcribe(filepath) -> str:
 
 def getSymptoms(transcription: str) -> str:
     client = OpenAI(api_key=OPENAI_API_KEY)
-    symptom_message.append({"role": "user", "content": transcription})
+    symptom_messages.append({"role": "user", "content": transcription})
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=symptom_message
+        messages=symptom_messages
     )
-    symptom_message.append({"role": "assistant", "content": completion.choices[0].message.content})
+    symptom_messages.append({"role": "assistant", "content": completion.choices[0].message.content})
     return completion.choices[0].message.content
 
 def respond(transcription: str, output_filename: str) -> str:

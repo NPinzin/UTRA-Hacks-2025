@@ -6,6 +6,19 @@ from audio import transcribe, getSymptoms, respond
 app = Flask(__name__)
 CORS(app)
 
+ORIGINAL_SYMPTOM_MESSAGES = [
+    {"role": "system", "content": "You are extracting symptoms from a hospital visit transcription. Return a comma-separated list of symptoms including all previously meantioned symptoms."}
+]
+ORIGINAL_RESPONSE_MESSAGES = [
+    {"role": "system", "content": (
+        "You are a hospital pre-screening AI. You must ask targeted follow-up "
+        "questions based on the patient’s symptoms to help doctors diagnose better. "
+        "Do not repeat previous questions. Ask different things each time. If symptoms are unclear, "
+        "probe for details (e.g., duration, severity, triggers). Keep responses brief and focused."
+    )}
+]
+
+
 UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -39,6 +52,14 @@ def upload_audio():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+@app.route('/reset', methods=['POST'])
+def reset_messages():
+    """ Reset conversation history to the original system prompt """
+    global symptom_messages, response_messages
+    symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
+    response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
+    return jsonify({"message": "Conversation history reset"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

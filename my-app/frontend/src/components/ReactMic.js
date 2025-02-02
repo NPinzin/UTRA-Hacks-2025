@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReactMic } from 'react-mic';
 
 export const Mic = () => {
   const [record, setRecord] = useState(false);
+
+  useEffect(() => {
+    // Reset conversation history when the page reloads
+    fetch('http://localhost:5000/reset', { method: 'POST' })
+      .then(response => response.json())
+      .then(data => console.log(data.message))
+      .catch(error => console.error("Error resetting conversation:", error));
+  }, []);
 
   const startRecording = () => {
     setRecord(true);
@@ -29,7 +37,7 @@ export const Mic = () => {
       });
       const result = await response.json();
       console.log('Success:', result);
-      const audio = new Audio(`${result.url}`);
+      const audio = new Audio(`${result.url}?t=${Date.now()}`);
       audio.play();
     } catch (error) {
       console.error('Error uploading file:', error);
