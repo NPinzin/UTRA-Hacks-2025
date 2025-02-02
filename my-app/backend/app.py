@@ -1,13 +1,18 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
-from audio import transcribe, getSymptoms, respond, reset_history
+from audio import transcribe, getSymptoms, respond, resetHistory, firstQuestion
 
 app = Flask(__name__)
 CORS(app)
 
 ORIGINAL_SYMPTOM_MESSAGES = [
-    {"role": "system", "content": "You are extracting symptoms from a hospital visit transcription. Return a comma-separated list of symptoms including all previously meantioned symptoms."}
+    {"role": "system", "content": (
+        "You are extracting symptoms from a hospital visit transcription."
+        "Be as descriptive as possible on each symptom, categorizing them in one or two words."
+        "Return a comma-separated list of symptoms including any and all previously meantioned symptoms."
+        "If you have no symptoms to report, from this or any previous communication, respond with an empty string"
+    )}
 ]
 ORIGINAL_RESPONSE_MESSAGES = [
     {"role": "system", "content": (
@@ -17,8 +22,6 @@ ORIGINAL_RESPONSE_MESSAGES = [
         "probe for details (e.g., duration, severity, triggers). Keep responses brief and focused."
     )}
 ]
-
-
 UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -56,8 +59,9 @@ def uploaded_file(filename):
 @app.route('/reset', methods=['POST'])
 def reset_messages():
     """ Reset conversation history to the original system prompt """
-    reset_history()
-    return jsonify({"message": "Conversation history reset"}), 200
+    resetHistory()
+    first_url = firstQuestion("first_question.mp3")
+    return jsonify({"url": first_url}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

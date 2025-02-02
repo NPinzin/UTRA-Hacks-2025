@@ -11,8 +11,8 @@ ORIGINAL_SYMPTOM_MESSAGES = [
     {"role": "system", "content": (
         "You are extracting symptoms from a hospital visit transcription."
         "Be as descriptive as possible on each symptom, categorizing them in one or two words."
-        "Return a comma-separated list of symptoms including all previously meantioned symptoms."
-        "If you have no symptoms to report, respond with an empty string"
+        "Return a comma-separated list of symptoms including any and all previously meantioned symptoms."
+        "If you have no symptoms to report, from this or any previous communication, respond with an empty string"
     )}
 ]
 ORIGINAL_RESPONSE_MESSAGES = [
@@ -26,11 +26,22 @@ ORIGINAL_RESPONSE_MESSAGES = [
 symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
 response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
 
-def reset_history():
+def resetHistory():
     global symptom_messages, response_messages
     symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
     response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
 
+def firstQuestion(output_filename: str) -> str:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    speech_file_path = os.path.join(UPLOAD_FOLDER, output_filename)
+    with client.audio.speech.with_streaming_response.create(
+        model="tts-1",
+        voice="coral",
+        speed=1,
+        input="Hello! I am a hospital pre-screening bot. Please describe your symptoms in detail and I will pass on the information to your doctor."
+    ) as response:
+        response.stream_to_file(speech_file_path)
+    return BASE_URL + output_filename  # Return URL instead of relative path
 
 
 def transcribe(filepath) -> str: 

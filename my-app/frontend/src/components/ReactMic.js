@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ReactMic } from 'react-mic';
 
-export const Mic = () => {
+export const Mic = ({postId}) => {
   const [record, setRecord] = useState(false);
 
   useEffect(() => {
     // Reset conversation history when the page reloads
     fetch('http://localhost:5000/reset', { method: 'POST' })
       .then(response => response.json())
-      .then(data => console.log(data.message))
+      .then(data => {
+        const firstQuestion = new Audio(`${data.url}`, { autoplay: true });
+        firstQuestion.play();
+      })
       .catch(error => console.error("Error resetting conversation:", error));
   }, []);
 
