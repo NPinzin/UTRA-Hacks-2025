@@ -8,7 +8,12 @@ UPLOAD_FOLDER = "uploads"  # Store all audio files in this directory
 BASE_URL = "http://localhost:5000/uploads/"  # Access uploaded files via this URL
 
 ORIGINAL_SYMPTOM_MESSAGES = [
-    {"role": "system", "content": "You are extracting symptoms from a hospital visit transcription. Return a comma-separated list of symptoms including all previously meantioned symptoms."}
+    {"role": "system", "content": (
+        "You are extracting symptoms from a hospital visit transcription."
+        "Be as descriptive as possible on each symptom, categorizing them in one or two words."
+        "Return a comma-separated list of symptoms including all previously meantioned symptoms."
+        "If you have no symptoms to report, respond with an empty string"
+    )}
 ]
 ORIGINAL_RESPONSE_MESSAGES = [
     {"role": "system", "content": (
