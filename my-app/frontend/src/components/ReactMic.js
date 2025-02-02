@@ -3,7 +3,6 @@ import { ReactMic } from 'react-mic';
 
 export const Mic = () => {
   const [record, setRecord] = useState(false);
-  const [audioSrc, setAudioSrc] = useState('');
 
   const startRecording = () => {
     setRecord(true);
@@ -30,8 +29,7 @@ export const Mic = () => {
       });
       const result = await response.json();
       console.log('Success:', result);
-      setAudioSrc('../uploads/' + result.url);
-      const audio = new Audio('../uploads/' + result.url);
+      const audio = new Audio(`${result.url}`);
       audio.play();
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -51,7 +49,6 @@ export const Mic = () => {
       <div>
       <button onClick={startRecording} type="button">Start</button>
       <button onClick={stopRecording} type="button">Stop</button>
-      {audioSrc && <audio src={audioSrc} autoPlay />}
       </div>
     </div>
   );
