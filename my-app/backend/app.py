@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
-from audio import transcribe, getSymptoms, respond
+from audio import transcribe, getSymptoms, respond, reset_history
 
 app = Flask(__name__)
 CORS(app)
@@ -56,9 +56,7 @@ def uploaded_file(filename):
 @app.route('/reset', methods=['POST'])
 def reset_messages():
     """ Reset conversation history to the original system prompt """
-    global symptom_messages, response_messages
-    symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
-    response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
+    reset_history()
     return jsonify({"message": "Conversation history reset"}), 200
 
 if __name__ == '__main__':

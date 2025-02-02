@@ -18,10 +18,14 @@ ORIGINAL_RESPONSE_MESSAGES = [
         "probe for details (e.g., duration, severity, triggers). Keep responses brief and focused."
     )}
 ]
-
-# Create mutable copies
 symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
 response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
+
+def reset_history():
+    global symptom_messages, response_messages
+    symptom_messages = ORIGINAL_SYMPTOM_MESSAGES.copy()
+    response_messages = ORIGINAL_RESPONSE_MESSAGES.copy()
+
 
 
 def transcribe(filepath) -> str: 
