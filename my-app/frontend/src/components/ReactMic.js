@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReactMic } from 'react-mic';
 
-export const Mic = ({postId}) => {
+export const Mic = ({ postId }) => {
   const [record, setRecord] = useState(false);
 
   useEffect(() => {
@@ -15,13 +15,17 @@ export const Mic = ({postId}) => {
       .catch(error => console.error("Error resetting conversation:", error));
   }, []);
 
-  const startRecording = () => {
-    setRecord(true);
-  };
+  useEffect(() => {
+    const cycleRecording = () => {
+      setRecord(true);
+      setTimeout(() => {
+        setRecord(false);
+        setTimeout(cycleRecording, 2000); // Wait 2 seconds before restarting
+      }, 10000); // Record for 10 seconds
+    };
 
-  const stopRecording = () => {
-    setRecord(false);
-  };
+    cycleRecording();
+  }, []);
 
   const onData = (recordedBlob) => {
     console.log('chunk of real-time data is: ', recordedBlob);
@@ -57,10 +61,6 @@ export const Mic = ({postId}) => {
         strokeColor="#000000"
         backgroundColor="#FF4081"
       />
-      <div>
-      <button onClick={startRecording} type="button">Start</button>
-      <button onClick={stopRecording} type="button">Stop</button>
-      </div>
     </div>
   );
 };
