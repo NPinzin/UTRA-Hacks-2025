@@ -8,8 +8,8 @@
 //---------------------------------------------
 // Configuration for WiFi and Backend URL
 //---------------------------------------------
-const char* ssid = "Alinas iPhone";
-const char* password = "gojeta98";
+const char* ssid = "abcd";
+const char* password = "1234";
 const char* backendUrl = "http://172.20.10.2:5001/api/posts/all-posts";
 
 //---------------------------------------------
